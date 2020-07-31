@@ -16,18 +16,7 @@ def create_index():
     with open('index.md', 'w') as index:
         index.write("# Index\n")
 
-        for root, dirs, files in os.walk('.'):
-            if 'venv' in dirs:
-                dirs.remove('venv')
-            if '.vscode' in dirs:
-                dirs.remove('.vscode')
-            if '.git' in dirs:
-                dirs.remove('.git')
-            if 'notes.egg-info' in dirs:
-                dirs.remove('notes.egg-info')
-            if 'pycache' in dirs:
-                dirs.remove('pycache')
-
+        for root, _, files in os.walk('.'):
             depth = root.count('/') + 1
 
             if os.path.basename(root) != '.':
