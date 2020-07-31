@@ -5,8 +5,8 @@ import pathlib
 
 MARKDOWN_VIEWER = "vmd"
 
-@click.command()
-def notes():
+@click.group(invoke_without_command=True)
+def cli():
     """Note taking CLI."""
     create_index()
     subprocess.Popen([MARKDOWN_VIEWER, "index.md"])
@@ -23,6 +23,10 @@ def create_index():
                 dirs.remove('.vscode')
             if '.git' in dirs:
                 dirs.remove('.git')
+            if 'notes.egg-info' in dirs:
+                dirs.remove('notes.egg-info')
+            if 'pycache' in dirs:
+                dirs.remove('pycache')
 
             depth = root.count('/') + 1
 
@@ -31,13 +35,11 @@ def create_index():
                 index.write(f"{'#' * depth} {os.path.basename(root)}\n")
 
             for file in files:
-                name, extension = file.split('.')
-                if extension != 'md':
+                try:
+                    name, extension = file.split('.')
+
+                    if extension == 'md':
+                        name = name.replace('-', ' ').title()
+                        index.write(f"- [{name}]({root}/{file})\n")
+                except:
                     continue
-                
-                name = name.replace('-', ' ').title()
-                index.write(f"- [{name}]({root}/{file})\n")
-
-
-if __name__ == '__main__':
-    notes()
