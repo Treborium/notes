@@ -22,9 +22,10 @@ def index_notes():
             if '.git' in dirs:
                 dirs.remove('.git')
 
+            depth = root.count('/') + 1
 
             if os.path.basename(root) != '.':
-                index.write(f"## {os.path.basename(root)}\n")
+                index.write(f"{'#' * depth} {os.path.basename(root)}\n")
 
             for file in files:
                 name, extension = file.split('.')
@@ -33,7 +34,6 @@ def index_notes():
 
                 index.write(f"- [{name}]({root}/{file})\n")
 
-            
 
 if __name__ == '__main__':
     notes()
