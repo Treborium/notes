@@ -6,6 +6,7 @@ setup(
     py_modules=['notes'],
     install_requires=[
         'Click',
+        'rich'
     ],
     entry_points='''
         [console_scripts]
