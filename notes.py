@@ -7,6 +7,7 @@ import json
 MARKDOWN_VIEWER = "vmd"
 CONFIG_FILE_NAME = ".config.json"
 
+
 @click.group(invoke_without_command=True)
 @click.pass_context
 def cli(ctx):
@@ -19,7 +20,8 @@ def cli(ctx):
 
     if ctx.invoked_subcommand is None:
         # Only open index if invoked without any subcommand
-        subprocess.Popen([MARKDOWN_VIEWER, root_directory.joinpath('index.md')])
+        subprocess.Popen(
+            [MARKDOWN_VIEWER, root_directory.joinpath('index.md')])
 
 
 def find_config_file(path: Path) -> str:
@@ -67,6 +69,10 @@ def write_list_of_notes(files, index_file, root):
 @click.command()
 @click.argument('file_name')
 def edit(file_name):
+    """Open FILE_NAME in the default system editor
+
+    FILE_NAME is the exact name of the file to open
+    """
     subprocess.run([os.environ['EDITOR'], file_name])
 
 
@@ -75,7 +81,7 @@ def init():
     """Initializes the current directory as the root directory"""
 
     with open(CONFIG_FILE_NAME, 'w') as config_file:
-        data = { 'root': os.getcwd() }
+        data = {'root': os.getcwd()}
         json.dump(data, config_file)
 
 
