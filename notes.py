@@ -40,10 +40,8 @@ def read_config_file(path: Path) -> dict:
 
 def create_index(root_directory: Path):
     with open(root_directory.joinpath('index.md'), 'w') as index_file:
-        index_file.write("# Index\n")
-
         for root, _, files in os.walk(root_directory):
-            depth = root.count('/') + 1
+            depth = root.count('/') - str(root_directory).count('/') + 1
 
             if os.path.basename(root) != '.':
                 # Don't list root directoy as heading
