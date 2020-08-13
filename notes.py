@@ -1,8 +1,11 @@
-import subprocess
-import click
-import os
-from pathlib import Path
 import json
+import os
+import subprocess
+import signal
+import threading
+from pathlib import Path
+
+import click
 
 MARKDOWN_VIEWER = "vmd"
 CONFIG_FILE_NAME = ".config.json"
@@ -71,7 +74,9 @@ def edit(file_name):
 
     FILE_NAME is the exact name of the file to open
     """
+    vmd_process = subprocess.Popen(['vmd', file_name])
     subprocess.run([os.environ['EDITOR'], file_name])
+    os.killpg(os.getpgid(vmd_process.pid), signal.SIGTERM)
 
 
 @click.command()
