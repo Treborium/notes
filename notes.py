@@ -89,7 +89,7 @@ def edit(file_name, no_preview):
 
     if not no_preview:
         vmd_process = subprocess.Popen([MARKDOWN_VIEWER, file_name])
-        
+
     subprocess.run([os.environ['EDITOR'], file_name])
 
     if not no_preview:
@@ -118,6 +118,17 @@ def select_file(files: list) -> str:
 
 
 @click.command()
+def ls():
+    config = get_config()
+    all_files = list()
+    for root, _, files in os.walk(Path(config['root'])):
+        all_files += [f"{root}/{file}" for file in files]
+
+    sorted_files = sorted(all_files)
+    format_row = "{}\n" * (len(sorted_files) + 1)
+    print(format_row.format("", *sorted_files))
+
+@click.command()
 def init():
     """Initializes the current directory as the root directory"""
 
@@ -128,3 +139,4 @@ def init():
 
 cli.add_command(edit)
 cli.add_command(init)
+cli.add_command(ls)
