@@ -74,7 +74,7 @@ def write_list_of_notes(files, index_file, root):
 
 @click.command()
 @click.argument('file_name',)
-@click.option('--no-preview', is_flag=True)
+@click.option('--no-preview', is_flag=True, help="Don't open markdown preview along with editor")
 def edit(file_name, no_preview):
     """Open FILE_NAME in the default system editor
 
@@ -87,13 +87,7 @@ def edit(file_name, no_preview):
         possible_files = find_possible_files(file_name)
         file_name = select_file(possible_files)
 
-    if not no_preview:
-        vmd_process = subprocess.Popen([MARKDOWN_VIEWER, file_name])
-
-    subprocess.run([os.environ['EDITOR'], file_name])
-
-    if not no_preview:
-        os.killpg(os.getpgid(vmd_process.pid), signal.SIGTERM)
+    open_file_in_editor(file_name, not no_preview)
 
 
 def find_possible_files(file_name: str) -> list:
@@ -117,8 +111,20 @@ def select_file(files: list) -> str:
         choices=files).launch()
 
 
+def open_file_in_editor(file_path: str, open_preview=True):
+    if open_preview:
+        vmd_process = subprocess.Popen([MARKDOWN_VIEWER, file_path])
+
+    subprocess.run([os.environ['EDITOR'], file_path])
+
+    if open_preview:
+        os.killpg(os.getpgid(vmd_process.pid), signal.SIGTERM)
+
+
 @click.command()
-def ls():
+@click.option('-i', '--interactive', is_flag=True, help='list files in interactive prompt and start selected file in default editor')
+def ls(interactive):
+    """List all files"""
     config = get_config()
     all_files = list()
     for root, _, files in os.walk(Path(config['root'])):
@@ -126,7 +132,15 @@ def ls():
 
     sorted_files = sorted(all_files)
     format_row = "{}\n" * (len(sorted_files) + 1)
-    print(format_row.format("", *sorted_files))
+    if interactive:
+        choice = Bullet(
+            prompt='Select file to open in editor',
+            choices=sorted_files).launch()
+        open_file_in_editor(choice)
+    else:
+        format_row = "{}\n" * (len(sorted_files) + 1)
+        print(format_row.format("", *sorted_files))
+
 
 @click.command()
 def init():
