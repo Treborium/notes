@@ -51,8 +51,8 @@ def create_index(root_directory: Path):
         for root, _, files in os.walk(root_directory):
             depth = root.count('/') - str(root_directory).count('/') + 1
 
+            # Don't list root directoy as heading
             if os.path.basename(root) != '.':
-                # Don't list root directoy as heading
                 # Write categories as titles
                 index_file.write(f"{'#' * depth} {os.path.basename(root)}\n")
 
@@ -73,20 +73,27 @@ def write_list_of_notes(files, index_file, root):
 
 
 @click.command()
-@click.argument('file_name')
-def edit(file_name):
+@click.argument('file_name',)
+@click.option('--no-preview', is_flag=True)
+def edit(file_name, no_preview):
     """Open FILE_NAME in the default system editor
 
     FILE_NAME is the exact name of the file to open
     """
+    if '.md' not in file_name:
+        file_name = file_name + '.md'
+
     if not os.path.isfile(file_name):
-        # TODO: If only 1 file then automatically open it
         possible_files = find_possible_files(file_name)
         file_name = select_file(possible_files)
 
-    vmd_process = subprocess.Popen([MARKDOWN_VIEWER, file_name])
+    if not no_preview:
+        vmd_process = subprocess.Popen([MARKDOWN_VIEWER, file_name])
+        
     subprocess.run([os.environ['EDITOR'], file_name])
-    os.killpg(os.getpgid(vmd_process.pid), signal.SIGTERM)
+
+    if not no_preview:
+        os.killpg(os.getpgid(vmd_process.pid), signal.SIGTERM)
 
 
 def find_possible_files(file_name: str) -> list:
@@ -104,7 +111,7 @@ def select_file(files: list) -> str:
     elif len(files) == 1:
         return files[0]
 
-    # Start bullet selection and return selection
+    # Start bullet selection and return choice
     return Bullet(
         prompt='Please select which file to open:',
         choices=files).launch()
