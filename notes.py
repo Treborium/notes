@@ -6,6 +6,7 @@ import threading
 from pathlib import Path
 
 import click
+from bullet import Bullet
 
 MARKDOWN_VIEWER = "vmd"
 CONFIG_FILE_NAME = ".config.json"
@@ -15,8 +16,7 @@ CONFIG_FILE_NAME = ".config.json"
 @click.pass_context
 def cli(ctx):
     """Note taking CLI."""
-    config_file_path = find_config_file(Path.cwd())
-    config_file = read_config_file(config_file_path)
+    config_file = get_config()
     root_directory = Path(config_file['root'])
 
     create_index(root_directory)
@@ -25,6 +25,11 @@ def cli(ctx):
         # Only open index if invoked without any subcommand
         subprocess.Popen(
             [MARKDOWN_VIEWER, root_directory.joinpath('index.md')])
+
+
+def get_config() -> dict:
+    config_path = find_config_file(Path.cwd())
+    return read_config_file(config_path)
 
 
 def find_config_file(path: Path) -> str:
@@ -74,9 +79,35 @@ def edit(file_name):
 
     FILE_NAME is the exact name of the file to open
     """
-    vmd_process = subprocess.Popen(['vmd', file_name])
+    if not os.path.isfile(file_name):
+        # TODO: If only 1 file then automatically open it
+        possible_files = find_possible_files(file_name)
+        file_name = select_file(possible_files)
+
+    vmd_process = subprocess.Popen([MARKDOWN_VIEWER, file_name])
     subprocess.run([os.environ['EDITOR'], file_name])
     os.killpg(os.getpgid(vmd_process.pid), signal.SIGTERM)
+
+
+def find_possible_files(file_name: str) -> list:
+    config = get_config()
+    possible_files = list()
+    for root, _, files in os.walk(Path(config['root'])):
+        if file_name in files:
+            possible_files.append(f"{root}/{file_name}")
+    return possible_files
+
+
+def select_file(files: list) -> str:
+    if len(files) == 0:
+        raise FileNotFoundError(f"Could not find file.")
+    elif len(files) == 1:
+        return files[0]
+
+    # Start bullet selection and return selection
+    return Bullet(
+        prompt='Please select which file to open:',
+        choices=files).launch()
 
 
 @click.command()

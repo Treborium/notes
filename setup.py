@@ -5,7 +5,8 @@ setup(
     version='0.1',
     py_modules=['notes'],
     install_requires=[
-        'Click'
+        'Click',
+        'Bullet'
     ],
     entry_points='''
         [console_scripts]
