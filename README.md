@@ -40,9 +40,9 @@
 
 ## Future Features
 
-- [ ] open/edit files from anywhere inside the notes directory with
+- [x] open/edit files from anywhere inside the notes directory with
       `notes edit <file_name>`
-- [ ] when calling `notes edit <file_name>` also spawn a _vmd_ window in
+- [x] when calling `notes edit <file_name>` also spawn a _vmd_ window in
       addition to the default text editor
 - [ ] list all files in the console to quickly see what's available `notes list`
 - [ ] add support for autocomplete with for example `fzf`
