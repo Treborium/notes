@@ -49,3 +49,4 @@
 - [ ] ignore certain folders, files or file extensions (same as `.gitignore`)
 - [ ] automaticaly link to topics/notes/files that already exist based on their
       name or maybe tags
+- [ ] auto create ToC for a selection of files
