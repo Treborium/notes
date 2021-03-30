@@ -8,7 +8,7 @@ lazy-object-proxy==1.4.3
 mccabe==0.6.1
 pprintpp==0.4.0
 pycodestyle==2.6.0
-Pygments==2.6.1
+Pygments==2.7.4
 pylint==2.5.3
 rich==5.0.0
 rope==0.17.0
